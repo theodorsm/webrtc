@@ -28,6 +28,8 @@ import (
 	"github.com/pion/webrtc/v3/internal/mux"
 	"github.com/pion/webrtc/v3/internal/util"
 	"github.com/pion/webrtc/v3/pkg/rtcerr"
+	"github.com/theodorsm/covert-dtls/pkg/fingerprints"
+	"github.com/theodorsm/covert-dtls/pkg/mimicry"
 )
 
 // DTLSTransport allows an application access to information about the DTLS
@@ -300,6 +302,10 @@ func (t *DTLSTransport) Start(remoteParameters DTLSParameters) error {
 		cert := t.certificates[0]
 		t.onStateChange(DTLSTransportStateConnecting)
 
+		fingerprint := fingerprints.Mozilla_Firefox_125_0_1
+		clientHello := mimicry.MimickedClientHello{}
+		clientHello.LoadFingerprint(fingerprint)
+
 		return t.role(), &dtls.Config{
 			Certificates: []tls.Certificate{
 				{
@@ -314,9 +320,10 @@ func (t *DTLSTransport) Start(remoteParameters DTLSParameters) error {
 
 				return defaultSrtpProtectionProfiles()
 			}(),
-			ClientAuth:         dtls.RequireAnyClientCert,
-			LoggerFactory:      t.api.settingEngine.LoggerFactory,
-			InsecureSkipVerify: !t.api.settingEngine.dtls.disableInsecureSkipVerify,
+			ClientAuth:             dtls.RequireAnyClientCert,
+			LoggerFactory:          t.api.settingEngine.LoggerFactory,
+			InsecureSkipVerify:     !t.api.settingEngine.dtls.disableInsecureSkipVerify,
+			ClientHelloMessageHook: clientHello.Hook,
 		}, nil
 	}
 
