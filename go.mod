@@ -20,8 +20,8 @@ require (
 	github.com/pion/transport/v2 v2.2.4
 	github.com/sclevine/agouti v3.0.0+incompatible
 	github.com/stretchr/testify v1.9.0
-	github.com/theodorsm/covert-dtls v0.0.0-20240501015759-571715024a63
+	github.com/theodorsm/covert-dtls v0.0.0-20240502182503-08c83c7d4069
 	golang.org/x/net v0.20.0
 )
 
-replace github.com/pion/dtls/v2 => /home/theodor/prog/master/dtls
+replace github.com/pion/dtls/v2 => /go/src/dtls
