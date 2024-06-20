@@ -13,13 +13,14 @@ import (
 	"net"
 	"time"
 
-	"github.com/pion/dtls/v2"
-	dtlsElliptic "github.com/pion/dtls/v2/pkg/crypto/elliptic"
 	"github.com/pion/ice/v2"
 	"github.com/pion/logging"
 	"github.com/pion/transport/v2"
 	"github.com/pion/transport/v2/packetio"
 	"github.com/pion/transport/v2/vnet"
+	"github.com/theodorsm/dtls/v2"
+	dtlsElliptic "github.com/theodorsm/dtls/v2/pkg/crypto/elliptic"
+	"github.com/theodorsm/dtls/v2/pkg/protocol/handshake"
 	"golang.org/x/net/proxy"
 )
 
@@ -72,6 +73,7 @@ type SettingEngine struct {
 		clientCAs                 *x509.CertPool
 		rootCAs                   *x509.CertPool
 		keyLogWriter              io.Writer
+		clientHelloHook           func(handshake.MessageClientHello) handshake.Message
 	}
 	sctp struct {
 		maxReceiveBufferSize uint32
@@ -427,6 +429,11 @@ func (e *SettingEngine) SetDTLSRootCAs(rootCAs *x509.CertPool) {
 // Logging key material compromises security and should only be use for debugging.
 func (e *SettingEngine) SetDTLSKeyLogWriter(writer io.Writer) {
 	e.dtls.keyLogWriter = writer
+}
+
+// SetDTLSClientHelloHook sets the hook for manipulation of DTLS ClientHello messages
+func (e *SettingEngine) SetDTLSClientHelloHook(hook func(handshake.MessageClientHello) handshake.Message) {
+	e.dtls.clientHelloHook = hook
 }
 
 // SetSCTPMaxReceiveBufferSize sets the maximum receive buffer size.

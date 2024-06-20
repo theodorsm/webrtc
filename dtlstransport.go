@@ -19,8 +19,6 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/pion/dtls/v2"
-	"github.com/pion/dtls/v2/pkg/crypto/fingerprint"
 	"github.com/pion/interceptor"
 	"github.com/pion/logging"
 	"github.com/pion/rtcp"
@@ -28,6 +26,8 @@ import (
 	"github.com/pion/webrtc/v3/internal/mux"
 	"github.com/pion/webrtc/v3/internal/util"
 	"github.com/pion/webrtc/v3/pkg/rtcerr"
+	"github.com/theodorsm/dtls/v2"
+	"github.com/theodorsm/dtls/v2/pkg/crypto/fingerprint"
 )
 
 // DTLSTransport allows an application access to information about the DTLS
@@ -343,6 +343,7 @@ func (t *DTLSTransport) Start(remoteParameters DTLSParameters) error {
 	dtlsConfig.ClientCAs = t.api.settingEngine.dtls.clientCAs
 	dtlsConfig.RootCAs = t.api.settingEngine.dtls.rootCAs
 	dtlsConfig.KeyLogWriter = t.api.settingEngine.dtls.keyLogWriter
+	dtlsConfig.ClientHelloMessageHook = t.api.settingEngine.dtls.clientHelloHook
 
 	// Connect as DTLS Client/Server, function is blocking and we
 	// must not hold the DTLSTransport lock
